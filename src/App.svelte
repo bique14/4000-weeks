@@ -1,6 +1,7 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
 
+  import Disclaimer from "./components/Disclaimer.svelte";
   import InputDate from "./components/InputDate.svelte";
   import InputFile from "./components/InputFile.svelte";
 
@@ -8,6 +9,7 @@
   import { createArray } from "./utils/array";
 
   import "./app.css";
+  import { onMount } from "svelte";
 
   const numRows: number = 77;
   const numColumns: number = 52;
@@ -17,6 +19,13 @@
   let base64Image = "";
   let dateOfBirth = "";
   let colors: any = [[]];
+
+  let userConsent: boolean = false;
+
+  onMount(() => {
+    const isConsent = sessionStorage.getItem("user_consent");
+    userConsent = isConsent === "true";
+  });
 
   $: grid = calculateGrid(dateOfBirth);
   $: {
@@ -47,6 +56,11 @@
     });
   };
 
+  const onConsentClick = () => {
+    sessionStorage.setItem("user_consent", JSON.stringify(true));
+    userConsent = true;
+  };
+
   const handleDateChanged = (event: any) => {
     dateOfBirth = event.detail;
   };
@@ -71,36 +85,40 @@
   };
 </script>
 
-<div class="wrapper">
-  <h1>4,000 weeks of life</h1>
-  <div style="display: flex; gap: 2rem; padding: 1rem 0;">
-    <InputFile on:fileChanged={handleFileChanged} />
-    <InputDate
-      hasBase64Image={base64Image.length}
-      on:dateChanged={handleDateChanged}
-    />
-  </div>
+{#if !Boolean(userConsent)}
+  <Disclaimer on:click={onConsentClick} />
+{:else}
+  <div class="wrapper">
+    <h1 style="font-weight: 400">4,000 weeks of life</h1>
+    <div style="display: flex; gap: 2rem; padding: 1rem 0;">
+      <InputFile on:fileChanged={handleFileChanged} />
+      <InputDate
+        hasBase64Image={base64Image.length}
+        on:dateChanged={handleDateChanged}
+      />
+    </div>
 
-  <div style="min-width: 21px; min-height: 21px">
-    {#if fileName}
-      <span
-        style="display: block; max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap"
-        in:fade>file name : {fileName}</span
-      >
-    {/if}
+    <div style="min-width: 21px; min-height: 21px">
+      {#if fileName}
+        <span
+          style="display: block; max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap"
+          in:fade>file name : {fileName}</span
+        >
+      {/if}
+    </div>
+    <div style="margin: 1rem 0;">
+      {#each grid as row, rowIndex (row)}
+        <div class="row" data-row={rowIndex}>
+          {#each row as color, colIndex (colIndex)}
+            <div
+              class="cell"
+              style="background-color: rgb({color.color.r},{color.color
+                .g},{color.color.b})"
+              data-column={colIndex}
+            />
+          {/each}
+        </div>
+      {/each}
+    </div>
   </div>
-  <div style="margin: 1rem 0;">
-    {#each grid as row, rowIndex (row)}
-      <div class="row" data-row={rowIndex}>
-        {#each row as color, colIndex (colIndex)}
-          <div
-            class="cell"
-            style="background-color: rgb({color.color.r},{color.color.g},{color
-              .color.b})"
-            data-column={colIndex}
-          />
-        {/each}
-      </div>
-    {/each}
-  </div>
-</div>
+{/if}
