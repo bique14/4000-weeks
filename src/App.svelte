@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { fade } from "svelte/transition";
 
   import Disclaimer from "./components/Disclaimer.svelte";
@@ -9,7 +10,6 @@
   import { createArray } from "./utils/array";
 
   import "./app.css";
-  import { onMount } from "svelte";
 
   const numRows: number = 77;
   const numColumns: number = 52;
