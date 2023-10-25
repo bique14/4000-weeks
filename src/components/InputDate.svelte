@@ -1,6 +1,9 @@
 <script lang="ts">
   import IMask from "imask";
   import { createEventDispatcher } from "svelte";
+  import { fade } from "svelte/transition";
+
+  export let hasBase64Image: number;
 
   const dispatch = createEventDispatcher();
 
@@ -76,11 +79,14 @@
   }
 </script>
 
-<input
-  style="padding: 0.75rem 1rem; font-size: 1.25rem; text-align: center;"
-  type="text"
-  placeholder="DD/MM/YYYY"
-  bind:this={inputElement}
-  bind:value={dateValue}
-  on:input={setupMask}
-/>
+{#if Boolean(hasBase64Image)}
+  <input
+    in:fade
+    style="padding: 0.75rem 1rem; font-size: 1.25rem; text-align: center; outline: none"
+    type="text"
+    placeholder="DD/MM/YYYY"
+    bind:this={inputElement}
+    bind:value={dateValue}
+    on:input={setupMask}
+  />
+{/if}
