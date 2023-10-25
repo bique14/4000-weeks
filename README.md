@@ -1,7 +1,7 @@
 todo:
 [] landing page
 [] handle input file before image date
-[] handle color when remove date input
+[x] handle color when remove date input
 [] calculate remaining times
 [] handle remaining times (overflow, etc)
 

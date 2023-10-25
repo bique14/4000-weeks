@@ -2,8 +2,6 @@
   import IMask from "imask";
   import { createEventDispatcher } from "svelte";
 
-  const EMPTY_VALUE = "_/__/____";
-
   const dispatch = createEventDispatcher();
 
   let dateValue = "";
@@ -66,7 +64,7 @@
   }
 
   $: {
-    if (dateValue === EMPTY_VALUE) {
+    if (dateValue.length < 10) {
       const currentDate = new Date();
       const day = String(currentDate.getDate()).padStart(2, "0");
       const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Months are zero-based
