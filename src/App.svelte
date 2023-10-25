@@ -33,7 +33,6 @@
       fetchImagePixels(base64Image);
     }
   }
-  // $: console.log("colors", colors);
 
   // Generate a 2D array representing the grid
   const _grid = createArray(numRows - 1).map(() => createArray(numColumns));
@@ -80,7 +79,6 @@
       },
     });
     const result = await response.json();
-    console.log("result", result);
     colors = result;
   };
 </script>
