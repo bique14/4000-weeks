@@ -3,7 +3,7 @@
   import { createEventDispatcher } from "svelte";
   import { fade } from "svelte/transition";
 
-  export let hasBase64Image: number;
+  export let hasFile: number;
 
   const dispatch = createEventDispatcher();
 
@@ -79,10 +79,10 @@
   }
 </script>
 
-{#if Boolean(hasBase64Image)}
+{#if Boolean(hasFile)}
   <input
     in:fade
-    style="padding: 0.75rem 1rem; font-size: 1.25rem; text-align: center; outline: none"
+    class="px-4 py-3 text-xl text-center outline-none border border-[#ccc] rounded"
     type="text"
     placeholder="DD/MM/YYYY"
     bind:this={inputElement}

@@ -48,7 +48,7 @@
         return {
           color:
             rowIndex * numColumns + columnIndex <
-            (+weeksSinceBirth(dateOfBirth) || 0)
+            (weeksSinceBirth(dateOfBirth) || 0)
               ? colors[rowIndex][columnIndex]
               : { r: 255, g: 255, b: 255 },
         };
@@ -89,36 +89,44 @@
   <Disclaimer on:click={onConsentClick} />
 {:else}
   <div class="wrapper">
-    <h1 style="font-weight: 400">4,000 weeks of life</h1>
-    <div style="display: flex; gap: 2rem; padding: 1rem 0;">
+    <h1 class="text-3xl my-4">4,000 weeks of life</h1>
+    {#if fileName}
+      <span class="italic text-[#999999] text-center whitespace-nowrap"
+        >you can select a new image or change the date of birth.</span
+      >
+    {/if}
+    <div class="flex gap-8 py-4">
       <InputFile on:fileChanged={handleFileChanged} />
-      <InputDate
-        hasBase64Image={base64Image.length}
-        on:dateChanged={handleDateChanged}
-      />
+      <InputDate hasFile={fileName.length} on:dateChanged={handleDateChanged} />
     </div>
 
     <div style="min-width: 21px; min-height: 21px">
       {#if fileName}
         <span
-          style="display: block; max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap"
+          class="block max-w-[400px] overflow-hidden text-ellipsis whitespace-nowrap"
           in:fade>file name : {fileName}</span
         >
       {/if}
     </div>
-    <div style="margin: 1rem 0;">
-      {#each grid as row, rowIndex (row)}
-        <div class="row" data-row={rowIndex}>
-          {#each row as color, colIndex (colIndex)}
-            <div
-              class="cell"
-              style="background-color: rgb({color.color.r},{color.color
-                .g},{color.color.b})"
-              data-column={colIndex}
-            />
-          {/each}
-        </div>
-      {/each}
-    </div>
+
+    {#if fileName}
+      <div in:fade style="margin: 1rem 0;">
+        {#each grid as row, rowIndex (row)}
+          <div class="row" data-row={rowIndex}>
+            {#each row as { color }, colIndex (colIndex)}
+              <div
+                class="cell"
+                style="background-color: rgb({color.r},{color.g},{color.b})"
+                data-column={colIndex}
+              />
+            {/each}
+          </div>
+        {/each}
+      </div>
+      <span in:fade
+        >คุณเดินทางมาแล้ว {(weeksSinceBirth(dateOfBirth) || 0).toLocaleString()}
+        สัปดาห์</span
+      >
+    {/if}
   </div>
 {/if}

@@ -1,9 +1,3 @@
-todo:
-[x] handle input file before image date
-[x] handle color when remove date input
-[] calculate remaining times
-[] handle remaining times (overflow, etc)
-
 # Svelte + TS + Vite
 
 This template should help get you started developing with Svelte and TypeScript in Vite.
