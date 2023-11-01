@@ -100,24 +100,30 @@
   };
 
   const onCaptureClick = async () => {
-    console.log(imageContainerRef);
     const canvas = await html2canvas(imageContainerRef);
     canvas.toBlob((blob: any) => {
-      const url: string = URL.createObjectURL(blob);
-      downloadImage("4000-weeks-of-you", url);
+      const description: string = "Here is my journey!";
+      shareImage(blob, "4000 weeks of me", description);
     });
   };
 
-  const downloadImage = (name: string, downloadUrl: string) => {
-    const a = document.createElement("a");
-    a.href = downloadUrl;
-    a.download = `${name}.png`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+  const shareImage = async (blob: Blob, title: string, text: string) => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          files: [
+            new File([blob], "4000-weeks-of-me.png", { type: blob.type }),
+          ],
+          title: title,
+          text: text,
+        });
+      } else {
+        throw new Error("Web Share API is not available.");
+      }
+    } catch (error) {
+      console.error("Error sharing image:", error);
+    }
   };
-
-  $: console.log("isFetchError", isFetchError);
 </script>
 
 <Toaster />
@@ -125,11 +131,11 @@
   <Disclaimer on:click={onConsentClick} />
 {:else}
   <div class="wrapper">
-    <!-- <h1 class="text-3xl my-4">4,000 weeks of life</h1> -->
+    <h1 class="text-3xl my-4">4,000 weeks of life</h1>
     {#if fileName && !isFetchError}
-      <span class="italic text-[#999999] text-center whitespace-nowrap"
-        >you can select a new image or change the date of birth.</span
-      >
+      <span class="italic text-[#999999] text-center whitespace-nowrap">
+        you can select a new image or change the date of birth.
+      </span>
     {/if}
     <div class="flex gap-8 py-4">
       <InputFile on:fileChanged={handleFileChanged} />
@@ -145,8 +151,10 @@
       {#if fileName && !isFetchError}
         <span
           class="block max-w-[400px] overflow-hidden text-ellipsis whitespace-nowrap"
-          in:fade>file name : {fileName}</span
+          in:fade
         >
+          file name : {fileName}
+        </span>
       {/if}
     </div>
 
