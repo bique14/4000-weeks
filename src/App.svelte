@@ -93,7 +93,7 @@
     } catch (e: any) {
       console.error("💥", e);
       isFetchError = true;
-      toast.error("It didn't works! Try again later.", {
+      toast.error(e.message, {
         position: "bottom-center",
       });
     }
@@ -104,8 +104,21 @@
     canvas.toBlob((blob: any) => {
       const description: string = "Here is my journey!";
       shareImage(blob, "4000 weeks of me", description);
+
+      // const url: string = URL.createObjectURL(blob);
+      // console.log(url);
+      // downloadImage(url);
     });
   };
+
+  // const downloadImage = (downloadUrl: string) => {
+  //   const a = document.createElement("a");
+  //   a.href = downloadUrl;
+  //   a.download = "reveluv.png";
+  //   document.body.appendChild(a);
+  //   a.click();
+  //   document.body.removeChild(a);
+  // };
 
   const shareImage = async (blob: Blob, title: string, text: string) => {
     try {
