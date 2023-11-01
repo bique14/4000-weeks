@@ -9,6 +9,7 @@
   import Disclaimer from "./components/Disclaimer.svelte";
   import InputDate from "./components/InputDate.svelte";
   import InputFile from "./components/InputFile.svelte";
+  import Cells from "./components/Cells.svelte";
 
   import { weeksSinceBirth } from "./utils/dob";
   import { createArray } from "./utils/array";
@@ -99,8 +100,8 @@
   };
 
   const onCaptureClick = async () => {
+    console.log(imageContainerRef);
     const canvas = await html2canvas(imageContainerRef);
-
     canvas.toBlob((blob: any) => {
       const url: string = URL.createObjectURL(blob);
       downloadImage("4000-weeks-of-you", url);
@@ -155,21 +156,7 @@
         in:fade
         style="margin: 1rem 0; padding: 2rem"
       >
-        {#each grid as row, rowIndex (row)}
-          <div class="row" data-row={rowIndex}>
-            {#each row as { color }, colIndex (colIndex)}
-              <div
-                class="cell"
-                style="background-color: rgb({color.r},{color.g},{color.b})"
-                data-column={colIndex}
-              />
-            {/each}
-          </div>
-        {/each}
-        <span class="my-4 block text-center tracking-wider" in:fade
-          >{(weeksSinceBirth(dateOfBirth) || 0).toLocaleString()} weeks of memories
-          sweet,<br />with every step, your life's a treat!
-        </span>
+        <Cells {grid} {dateOfBirth} />
       </div>
 
       <!-- {#if dateOfBirth} -->
