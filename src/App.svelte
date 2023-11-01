@@ -5,7 +5,7 @@
   import toast, { Toaster } from "svelte-french-toast";
 
   import { ENDPOINT_URL } from "./utils/env";
-
+  console.log("ENDPOINT_URL", ENDPOINT_URL);
   import Disclaimer from "./components/Disclaimer.svelte";
   import InputDate from "./components/InputDate.svelte";
   import InputFile from "./components/InputFile.svelte";
