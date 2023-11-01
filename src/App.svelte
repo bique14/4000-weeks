@@ -35,7 +35,7 @@
     userConsent = isConsent === "true";
   });
 
-  $: grid = calculateGrid(dateOfBirth);
+  $: grid = calculateGrid(dateOfBirth, colors);
   $: {
     if (base64Image) {
       fetchImagePixels(base64Image);
@@ -49,7 +49,7 @@
   const combineGrid = [..._grid, lastRow];
 
   // note: all grid is 4000
-  const calculateGrid = (dateOfBirth: string) => {
+  const calculateGrid = (dateOfBirth: string, colors: any) => {
     return combineGrid.map((row, rowIndex) => {
       return row.map((cell, columnIndex) => {
         return {
@@ -180,14 +180,14 @@
         <Cells {grid} {dateOfBirth} />
       </div>
 
-      <!-- {#if dateOfBirth} -->
-      <button
-        class="-mt-4 rounded p-2 text-white bg-[rgb(167,205,90)]"
-        on:click={onCaptureClick}
-      >
-        Share Image
-      </button>
-      <!-- {/if} -->
+      {#if dateOfBirth}
+        <button
+          class="-mt-4 rounded p-2 text-white bg-[rgb(167,205,90)]"
+          on:click={onCaptureClick}
+        >
+          Share Image
+        </button>
+      {/if}
     {/if}
   </div>
 {/if}
