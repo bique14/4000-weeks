@@ -1,6 +1,10 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { fade } from "svelte/transition";
+  import html2canvas from "html2canvas";
+  import toast, { Toaster } from "svelte-french-toast";
+
+  import { ENDPOINT_URL } from "./utils/env";
 
   import Disclaimer from "./components/Disclaimer.svelte";
   import InputDate from "./components/InputDate.svelte";
@@ -15,12 +19,15 @@
   const numColumns: number = 52;
   const lastRowColumns: number = 48; // Number of columns in the last row
 
+  let userConsent: boolean = false;
+
+  let isFetchError = false;
   let fileName = "";
   let base64Image = "";
   let dateOfBirth = "";
   let colors: any = [[]];
 
-  let userConsent: boolean = false;
+  let imageContainerRef: HTMLDivElement;
 
   onMount(() => {
     const isConsent = sessionStorage.getItem("user_consent");
@@ -71,35 +78,70 @@
   };
 
   const fetchImagePixels = async (base64Image: string) => {
-    const response = await fetch("http://localhost:5000/upload", {
-      method: "POST",
-      body: JSON.stringify({ image: base64Image }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const result = await response.json();
-    colors = result;
+    try {
+      isFetchError = false;
+      const response = await fetch(`${ENDPOINT_URL}/upload`, {
+        method: "POST",
+        body: JSON.stringify({ image: base64Image }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const result = await response.json();
+      colors = result;
+    } catch (e: any) {
+      console.error("💥", e);
+      isFetchError = true;
+      toast.error("It didn't works! Try again later.", {
+        position: "bottom-center",
+      });
+    }
   };
+
+  const onCaptureClick = async () => {
+    const canvas = await html2canvas(imageContainerRef);
+
+    canvas.toBlob((blob: any) => {
+      const url: string = URL.createObjectURL(blob);
+      downloadImage("4000-weeks-of-you", url);
+    });
+  };
+
+  const downloadImage = (name: string, downloadUrl: string) => {
+    const a = document.createElement("a");
+    a.href = downloadUrl;
+    a.download = `${name}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  $: console.log("isFetchError", isFetchError);
 </script>
 
+<Toaster />
 {#if !Boolean(userConsent)}
   <Disclaimer on:click={onConsentClick} />
 {:else}
   <div class="wrapper">
-    <h1 class="text-3xl my-4">4,000 weeks of life</h1>
-    {#if fileName}
+    <!-- <h1 class="text-3xl my-4">4,000 weeks of life</h1> -->
+    {#if fileName && !isFetchError}
       <span class="italic text-[#999999] text-center whitespace-nowrap"
         >you can select a new image or change the date of birth.</span
       >
     {/if}
     <div class="flex gap-8 py-4">
       <InputFile on:fileChanged={handleFileChanged} />
-      <InputDate hasFile={fileName.length} on:dateChanged={handleDateChanged} />
+      {#if !isFetchError}
+        <InputDate
+          hasFile={fileName.length}
+          on:dateChanged={handleDateChanged}
+        />
+      {/if}
     </div>
 
     <div style="min-width: 21px; min-height: 21px">
-      {#if fileName}
+      {#if fileName && !isFetchError}
         <span
           class="block max-w-[400px] overflow-hidden text-ellipsis whitespace-nowrap"
           in:fade>file name : {fileName}</span
@@ -107,8 +149,12 @@
       {/if}
     </div>
 
-    {#if fileName}
-      <div in:fade style="margin: 1rem 0;">
+    {#if fileName && !isFetchError}
+      <div
+        bind:this={imageContainerRef}
+        in:fade
+        style="margin: 1rem 0; padding: 2rem"
+      >
         {#each grid as row, rowIndex (row)}
           <div class="row" data-row={rowIndex}>
             {#each row as { color }, colIndex (colIndex)}
@@ -120,11 +166,20 @@
             {/each}
           </div>
         {/each}
+        <span class="my-4 block text-center tracking-wider" in:fade
+          >{(weeksSinceBirth(dateOfBirth) || 0).toLocaleString()} weeks of memories
+          sweet,<br />with every step, your life's a treat!
+        </span>
       </div>
-      <span in:fade
-        >คุณเดินทางมาแล้ว {(weeksSinceBirth(dateOfBirth) || 0).toLocaleString()}
-        สัปดาห์</span
+
+      <!-- {#if dateOfBirth} -->
+      <button
+        class="-mt-4 rounded p-2 text-white bg-[rgb(167,205,90)]"
+        on:click={onCaptureClick}
       >
+        Share Image
+      </button>
+      <!-- {/if} -->
     {/if}
   </div>
 {/if}
