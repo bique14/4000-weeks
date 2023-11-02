@@ -5,7 +5,7 @@
   import toast, { Toaster } from "svelte-french-toast";
 
   import { ENDPOINT_URL } from "./utils/env";
-  console.log("ENDPOINT_URL", ENDPOINT_URL);
+
   import Disclaimer from "./components/Disclaimer.svelte";
   import InputDate from "./components/InputDate.svelte";
   import InputFile from "./components/InputFile.svelte";
@@ -15,6 +15,9 @@
   import { createArray } from "./utils/array";
 
   import "./app.css";
+  import Loading from "./components/Loading.svelte";
+
+  console.log("ENDPOINT_URL", ENDPOINT_URL);
 
   const numRows: number = 77;
   const numColumns: number = 52;
@@ -23,6 +26,7 @@
   let userConsent: boolean = false;
 
   let isFetchError = false;
+  let isLoading = false;
   let fileName = "";
   let base64Image = "";
   let dateOfBirth = "";
@@ -81,6 +85,7 @@
   const fetchImagePixels = async (base64Image: string) => {
     try {
       isFetchError = false;
+      isLoading = true;
       const response = await fetch(`${ENDPOINT_URL}/upload`, {
         method: "POST",
         body: JSON.stringify({ image: base64Image }),
@@ -90,9 +95,11 @@
       });
       const result = await response.json();
       colors = result;
+      isLoading = false;
     } catch (e: any) {
       console.error("💥", e);
       isFetchError = true;
+      isLoading = false;
       toast.error(e.message, {
         position: "bottom-center",
       });
@@ -151,7 +158,7 @@
       </span>
     {/if}
     <div class="flex gap-8 py-4">
-      <InputFile on:fileChanged={handleFileChanged} />
+      <InputFile {isLoading} on:fileChanged={handleFileChanged} />
       {#if !isFetchError}
         <InputDate
           hasFile={fileName.length}
@@ -177,7 +184,11 @@
         in:fade
         style="margin: 1rem 0; padding: 2rem"
       >
-        <Cells {grid} {dateOfBirth} />
+        {#if isLoading}
+          <Loading />
+        {:else}
+          <Cells {grid} {dateOfBirth} />
+        {/if}
       </div>
 
       {#if dateOfBirth}
