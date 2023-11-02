@@ -17,12 +17,7 @@
     {/each}
   </div>
 {/each}
-<div
-  class="my-4 flex flex-col break-all text-center tracking-[0.001rem]"
-  in:fade
->
-  <span>
-    {(weeksSinceBirth(dateOfBirth) || 0).toLocaleString()} weeks of memories sweet,
-  </span>
-  <span>with every step, your life's a treat!</span>
-</div>
+<span class="my-4 block break-all text-center tracking-[0.001rem]" in:fade>
+  {(weeksSinceBirth(dateOfBirth) || 0).toLocaleString()} weeks of memories sweet,
+  <br />with every step, your life's a treat!
+</span>
